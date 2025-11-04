@@ -1,0 +1,139 @@
+body, html {
+  background: #f4f6f8;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+.container {
+  max-width: 950px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 32px #0002;
+  padding: 32px 40px 24px 40px;
+}
+
+h1 {
+  font-size: 2.4rem;
+  text-align: center;
+  margin-bottom: 24px;
+  color: #35495e;
+  letter-spacing: 0.08em;
+}
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.search-bar input {
+  padding: 7px 11px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn {
+  padding: 7px 20px;
+  background: #4361ee;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-left: 2px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn:active, .btn:focus {
+  outline: none;
+}
+.btn-primary {
+  background: #3f37c9;
+}
+.btn-danger {
+  background: #e63946;
+}
+.btn-grey {
+  background: #8d99ae !important;
+  color: #fff !important;
+}
+.btn-small {
+  font-size: 0.94rem;
+  padding: 5px 11px;
+  margin: 0 2px;
+}
+
+.form {
+  margin: 0 auto 28px auto;
+  padding: 20px 18px;
+  border-radius: 8px;
+  background: #ece9f7;
+  box-shadow: 0 1px 2px #bbb2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.form .row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.form input {
+  padding: 7px 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  font-size: 1rem;
+}
+.form input:focus {
+  border-color: #4361ee;
+}
+
+.contacts-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 1px 8px #eee;
+}
+
+.contacts-table th, .contacts-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f2f2f2;
+  text-align: left;
+}
+
+.contacts-table th {
+  background: #f3f5fa;
+  font-weight: 600;
+  font-size: 1.03rem;
+  letter-spacing: 0.05em;
+  color: #234;
+}
+
+.contacts-table tbody tr:hover {
+  background: #f4f6fc;
+  transition: background 0.18s;
+}
+
+.error {
+  background: #ffe8e8;
+  color: #e63946;
+  padding: 11px 15px;
+  border-radius: 6px;
+  margin: 17px auto;
+  text-align: center;
+  max-width: 400px;
+  letter-spacing:0.04em;
+}
+
+footer {
+  margin: 0;
+  text-align: center;
+  color: #aaa;
+}
