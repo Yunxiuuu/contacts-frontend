@@ -17,14 +17,30 @@ function App() {
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
 
+  // 从环境变量读取后端基础 URL（在 Vercel 中设置 REACT_APP_API_BASE）
+  // 如果为空字符串，axios 会使用相对路径（不建议生产）
+  const API_BASE = process.env.REACT_APP_API_BASE || "";
+
+  // 可选：在控制台打印，确认构建时已注入变量（部署后可以移除）
+  // console.log("API_BASE =", API_BASE);
+
+  // 如果有 API_BASE，则把 axios 的 baseURL 设置为它，后续请求就写相对路径更简单
+  if (API_BASE) {
+    axios.defaults.baseURL = API_BASE;
+  }
+
+  // 辅助：根据传入 name/phone 构建查询参数并调用 /api/contacts
   const fetchContacts = async (name = "", phone = "") => {
-    let url = `http://localhost:5000/api/contacts?`;
-    if (name) url += `name=${encodeURIComponent(name)}&`;
-    if (phone) url += `phone=${encodeURIComponent(phone)}`;
     try {
-      const res = await axios.get(url);
+      const params = {};
+      if (name) params.name = name;
+      if (phone) params.phone = phone;
+
+      // 使用 axios.get('/api/contacts', { params })，当 axios.defaults.baseURL 已设置，会自动加上 base
+      const res = await axios.get("/api/contacts", { params });
       setContacts(res.data);
     } catch (e) {
+      console.error("fetchContacts error:", e);
       setError("Failed to fetch contacts.");
     }
   };
@@ -46,25 +62,28 @@ function App() {
     }
     try {
       if (editing) {
-        await axios.put(
-          `http://localhost:5000/api/contacts/${editing}`,
-          form
-        );
+        await axios.put(`/api/contacts/${editing}`, form);
         setEditing(null);
       } else {
-        await axios.post("http://localhost:5000/api/contacts", form);
+        await axios.post("/api/contacts", form);
       }
       setForm(emptyForm);
       fetchContacts(searchName, searchPhone);
-    } catch (e) {
-      setError(e.response?.data?.error || "Error saving!");
+    } catch (err) {
+      console.error("save error:", err);
+      setError(err.response?.data?.error || "Error saving!");
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this contact?")) {
-      await axios.delete(`http://localhost:5000/api/contacts/${id}`);
-      fetchContacts(searchName, searchPhone);
+      try {
+        await axios.delete(`/api/contacts/${id}`);
+        fetchContacts(searchName, searchPhone);
+      } catch (err) {
+        console.error("delete error:", err);
+        setError("Failed to delete.");
+      }
     }
   };
 
@@ -75,8 +94,13 @@ function App() {
 
   const handleClearAll = async () => {
     if (window.confirm("Clear all contacts? This cannot be undone!")) {
-      await axios.delete("http://localhost:5000/api/contacts");
-      fetchContacts();
+      try {
+        await axios.delete("/api/contacts");
+        fetchContacts();
+      } catch (err) {
+        console.error("clear all error:", err);
+        setError("Failed to clear contacts.");
+      }
     }
   };
 
@@ -90,7 +114,6 @@ function App() {
     fetchContacts();
   };
 
-  // A simple alphabetical letter for sorting indicator
   const getFirstLetter = (name) => {
     return (name && name[0] ? name[0].toUpperCase() : "#");
   };
