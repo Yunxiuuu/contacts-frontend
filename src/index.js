@@ -9,14 +9,3 @@ root.render(
     <App />
   </React.StrictMode>
 );
-<!-- index.html -->
-<!doctype html>
-<html>
-  <head><meta charset="utf-8"><title>Contacts</title></head>
-  <body>
-    <h1>Contacts</h1>
-    <ul id="list"></ul>
-    <script src="index.js"></script>
-  </body>
-</html>
-
