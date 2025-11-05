@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 
+// 从环境变量中读取后端 API 地址
+const BASE_URL = process.env.REACT_APP_API_URL;
+
 const emptyForm = {
   name: "",
   phone: "",
@@ -17,30 +20,16 @@ function App() {
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
 
-  // 从环境变量读取后端基础 URL（在 Vercel 中设置 REACT_APP_API_BASE）
-  // 如果为空字符串，axios 会使用相对路径（不建议生产）
-  const API_BASE = process.env.REACT_APP_API_BASE || "";
-
-  // 可选：在控制台打印，确认构建时已注入变量（部署后可以移除）
-  // console.log("API_BASE =", API_BASE);
-
-  // 如果有 API_BASE，则把 axios 的 baseURL 设置为它，后续请求就写相对路径更简单
-  if (API_BASE) {
-    axios.defaults.baseURL = API_BASE;
-  }
-
-  // 辅助：根据传入 name/phone 构建查询参数并调用 /api/contacts
+  // 获取联系人列表
   const fetchContacts = async (name = "", phone = "") => {
+    let url = `${BASE_URL}/api/contacts?`;
+    if (name) url += `name=${encodeURIComponent(name)}&`;
+    if (phone) url += `phone=${encodeURIComponent(phone)}`;
     try {
-      const params = {};
-      if (name) params.name = name;
-      if (phone) params.phone = phone;
-
-      // 使用 axios.get('/api/contacts', { params })，当 axios.defaults.baseURL 已设置，会自动加上 base
-      const res = await axios.get("/api/contacts", { params });
+      const res = await axios.get(url);
       setContacts(res.data);
     } catch (e) {
-      console.error("fetchContacts error:", e);
+      console.error("Fetch error:", e);
       setError("Failed to fetch contacts.");
     }
   };
@@ -49,10 +38,12 @@ function App() {
     fetchContacts();
   }, []);
 
+  // 表单输入变化
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // 提交表单（新增或更新）
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -62,48 +53,52 @@ function App() {
     }
     try {
       if (editing) {
-        await axios.put(`/api/contacts/${editing}`, form);
+        await axios.put(`${BASE_URL}/api/contacts/${editing}`, form);
         setEditing(null);
       } else {
-        await axios.post("/api/contacts", form);
+        await axios.post(`${BASE_URL}/api/contacts`, form);
       }
       setForm(emptyForm);
       fetchContacts(searchName, searchPhone);
-    } catch (err) {
-      console.error("save error:", err);
-      setError(err.response?.data?.error || "Error saving!");
+    } catch (e) {
+      console.error("Save error:", e);
+      setError(e.response?.data?.error || "Error saving!");
     }
   };
 
+  // 删除联系人
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this contact?")) {
       try {
-        await axios.delete(`/api/contacts/${id}`);
+        await axios.delete(`${BASE_URL}/api/contacts/${id}`);
         fetchContacts(searchName, searchPhone);
-      } catch (err) {
-        console.error("delete error:", err);
-        setError("Failed to delete.");
+      } catch (e) {
+        console.error("Delete error:", e);
+        setError("Failed to delete contact.");
       }
     }
   };
 
+  // 编辑联系人
   const handleEdit = (contact) => {
     setForm(contact);
     setEditing(contact._id);
   };
 
+  // 清空所有联系人
   const handleClearAll = async () => {
     if (window.confirm("Clear all contacts? This cannot be undone!")) {
       try {
-        await axios.delete("/api/contacts");
+        await axios.delete(`${BASE_URL}/api/contacts`);
         fetchContacts();
-      } catch (err) {
-        console.error("clear all error:", err);
+      } catch (e) {
+        console.error("Clear all error:", e);
         setError("Failed to clear contacts.");
       }
     }
   };
 
+  // 搜索与重置
   const handleSearch = () => {
     fetchContacts(searchName, searchPhone);
   };
@@ -114,13 +109,15 @@ function App() {
     fetchContacts();
   };
 
+  // 字母标签
   const getFirstLetter = (name) => {
-    return (name && name[0] ? name[0].toUpperCase() : "#");
+    return name && name[0] ? name[0].toUpperCase() : "#";
   };
 
   return (
     <div className="container">
       <h1>Contact Management</h1>
+
       <div className="search-bar">
         <input
           placeholder="Search by name"
@@ -132,9 +129,15 @@ function App() {
           value={searchPhone}
           onChange={(e) => setSearchPhone(e.target.value)}
         />
-        <button className="btn" onClick={handleSearch}>Search</button>
-        <button className="btn btn-grey" onClick={handleReset}>Reset</button>
-        <button className="btn btn-danger" onClick={handleClearAll}>Clear All</button>
+        <button className="btn" onClick={handleSearch}>
+          Search
+        </button>
+        <button className="btn btn-grey" onClick={handleReset}>
+          Reset
+        </button>
+        <button className="btn btn-danger" onClick={handleClearAll}>
+          Clear All
+        </button>
       </div>
 
       <form className="form" onSubmit={handleSubmit}>
@@ -167,7 +170,7 @@ function App() {
         <button className="btn btn-primary" type="submit">
           {editing ? "Update Contact" : "Add Contact"}
         </button>
-        {editing ? (
+        {editing && (
           <button
             className="btn btn-grey"
             type="button"
@@ -178,7 +181,7 @@ function App() {
           >
             Cancel
           </button>
-        ) : null}
+        )}
       </form>
 
       {error && <div className="error">{error}</div>}
@@ -224,9 +227,10 @@ function App() {
           ))}
         </tbody>
       </table>
+
       <footer>
         <p style={{ color: "#777", marginTop: 32 }}>
-          &copy; {new Date().getFullYear()}  Contacts created by Yunxiuuu ఇ ◝‿◜ ఇ
+          &copy; {new Date().getFullYear()} Contacts created by Yunxiuuu ఇ ◝‿◜ ఇ
         </p>
       </footer>
     </div>
