@@ -7,11 +7,17 @@ function ContactList() {
 
   useEffect(() => {
     fetchContacts();
+    // eslint-disable-next-line
   }, [filterBookmarks]);
 
   async function fetchContacts() {
-    const res = await api.get('/contacts', { params: filterBookmarks ? { bookmarked: 'true' } : {} });
-    setContacts(res.data);
+    try {
+      const res = await api.get('/contacts', { params: filterBookmarks ? { bookmarked: 'true' } : {} });
+      setContacts(res.data);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to fetch contacts');
+    }
   }
 
   async function toggleBookmark(id, current) {
