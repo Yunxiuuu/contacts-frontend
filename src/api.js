@@ -1,12 +1,29 @@
-import axios from 'axios';
+const API_BASE =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:3000";
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
+export async function fetchContacts() {
+  const res = await fetch(`${API_BASE}/api/contacts`);
+  return res.json();
+}
 
-const instance = axios.create({
-  baseURL: API_BASE,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+export async function createContact(data) {
+  const res = await fetch(`${API_BASE}/api/contacts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
 
-export default instance;
+export async function deleteContact(id) {
+  await fetch(`${API_BASE}/api/contacts/${id}`, {
+    method: "DELETE"
+  });
+}
+
+export async function toggleFavorite(id) {
+  const res = await fetch(`${API_BASE}/api/contacts/${id}/favorite`, {
+    method: "PATCH"
+  });
+  return res.json();
+}
