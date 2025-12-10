@@ -25,6 +25,8 @@ function ContactForm() {
       const res = await api.post('/contacts', payload);
       alert('Created: ' + res.data.name);
       setName(''); setNote(''); setMethods([emptyMethod()]);
+      // Optionally you could emit an event to refresh list; simple approach: reload window
+      window.location.reload();
     } catch (err) {
       console.error(err);
       alert('Failed to create contact');
