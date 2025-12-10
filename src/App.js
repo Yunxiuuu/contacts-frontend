@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
+import React from 'react';
+import ContactList from './components/ContactList';
+import ContactForm from './components/ContactForm';
+import ImportExport from './components/ImportExport';
 
+function App() {
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Contacts</h1>
+      <ImportExport />
+      <ContactForm />
+      <hr />
+      <ContactList />
+    </div>
+  );
+}
+
+export default App;
 // 从环境变量中读取后端 API 地址
 const BASE_URL = process.env.REACT_APP_API_URL;
 
