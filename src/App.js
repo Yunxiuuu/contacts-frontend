@@ -9,6 +9,9 @@ const emptyForm = {
   other: "",
 };
 
+// Vercel 上后端就是 /api/... 不要写 localhost！
+const API = "/api/contacts";
+
 function App() {
   const [form, setForm] = useState(emptyForm);
   const [contacts, setContacts] = useState([]);
@@ -18,13 +21,15 @@ function App() {
   const [error, setError] = useState("");
 
   const fetchContacts = async (name = "", phone = "") => {
-    let url = `http://localhost:5000/api/contacts?`;
+    let url = `${API}?`;
     if (name) url += `name=${encodeURIComponent(name)}&`;
     if (phone) url += `phone=${encodeURIComponent(phone)}`;
+
     try {
       const res = await axios.get(url);
       setContacts(res.data);
     } catch (e) {
+      console.log(e);
       setError("Failed to fetch contacts.");
     }
   };
@@ -40,20 +45,20 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     if (!form.name.trim() || !form.phone.trim()) {
       setError("Name and phone are required.");
       return;
     }
+
     try {
       if (editing) {
-        await axios.put(
-          `http://localhost:5000/api/contacts/${editing}`,
-          form
-        );
+        await axios.put(`${API}/${editing}`, form);
         setEditing(null);
       } else {
-        await axios.post("http://localhost:5000/api/contacts", form);
+        await axios.post(API, form);
       }
+
       setForm(emptyForm);
       fetchContacts(searchName, searchPhone);
     } catch (e) {
@@ -62,8 +67,8 @@ function App() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this contact?")) {
-      await axios.delete(`http://localhost:5000/api/contacts/${id}`);
+    if (window.confirm("Are you sure?")) {
+      await axios.delete(`${API}/${id}`);
       fetchContacts(searchName, searchPhone);
     }
   };
@@ -74,8 +79,8 @@ function App() {
   };
 
   const handleClearAll = async () => {
-    if (window.confirm("Clear all contacts? This cannot be undone!")) {
-      await axios.delete("http://localhost:5000/api/contacts");
+    if (window.confirm("Clear ALL contacts?")) {
+      await axios.delete(API);
       fetchContacts();
     }
   };
@@ -90,14 +95,10 @@ function App() {
     fetchContacts();
   };
 
-  // A simple alphabetical letter for sorting indicator
-  const getFirstLetter = (name) => {
-    return (name && name[0] ? name[0].toUpperCase() : "#");
-  };
-
   return (
     <div className="container">
       <h1>Contact Management</h1>
+
       <div className="search-bar">
         <input
           placeholder="Search by name"
@@ -141,10 +142,12 @@ function App() {
             onChange={handleChange}
           />
         </div>
+
         <button className="btn btn-primary" type="submit">
-          {editing ? "Update Contact" : "Add Contact"}
+          {editing ? "Update" : "Add Contact"}
         </button>
-        {editing ? (
+
+        {editing && (
           <button
             className="btn btn-grey"
             type="button"
@@ -155,7 +158,7 @@ function App() {
           >
             Cancel
           </button>
-        ) : null}
+        )}
       </form>
 
       {error && <div className="error">{error}</div>}
@@ -171,6 +174,7 @@ function App() {
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {contacts.length === 0 && (
             <tr>
@@ -179,9 +183,10 @@ function App() {
               </td>
             </tr>
           )}
+
           {contacts.map((c) => (
             <tr key={c._id}>
-              <td>{getFirstLetter(c.name)}</td>
+              <td>{c.name?.[0]?.toUpperCase() || "#"}</td>
               <td>{c.name}</td>
               <td>{c.phone}</td>
               <td>{c.email}</td>
@@ -201,9 +206,10 @@ function App() {
           ))}
         </tbody>
       </table>
+
       <footer>
         <p style={{ color: "#777", marginTop: 32 }}>
-          &copy; {new Date().getFullYear()}  Contacts created by Yunxiuuu ఇ ◝‿◜ ఇ
+          © {new Date().getFullYear()} Contacts created by Yunxiuuu
         </p>
       </footer>
     </div>
