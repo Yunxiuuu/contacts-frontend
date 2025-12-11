@@ -1,8 +1,11 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "framework": "create-react-app",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://contacts-backend-git-main-yunxiuuus-projects.vercel.app/api/:path*"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
