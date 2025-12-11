@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://contacts-backend-nine.vercel.app/api/:path*"
+      "destination": "https://contacts-backend-git-main-yunxiuuus-projects.vercel.app/api/:path*"
     }
   ]
 }
