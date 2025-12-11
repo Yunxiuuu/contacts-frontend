@@ -1,15 +1,23 @@
 {
   "name": "contacts-frontend",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "vue": "^3.3.4",
+    "axios": "^1.5.0",
+    "vue-router": "^4.2.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "vite": "^4.4.9"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
   }
 }
